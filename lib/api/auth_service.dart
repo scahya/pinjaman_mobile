@@ -26,12 +26,13 @@ class AuthService {
     String username,
     String password,
     String namaLengkap,
+    String role,
   ) async {
     final res = await client.post("/api/auth/register", {
       "username": username,
       "password": password,
       "namaLengkap": namaLengkap,
-      "role": "Nasabah",
+      "role": role,
     });
 
     final body = jsonDecode(res.body);

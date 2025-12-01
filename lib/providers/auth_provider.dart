@@ -6,6 +6,7 @@ class AuthProvider extends ChangeNotifier {
   final AuthService authService;
 
   String? token;
+  String? userRole;
   bool loading = false;
   String? errorMessage;
 
@@ -27,10 +28,12 @@ class AuthProvider extends ChangeNotifier {
       }
 
       token = res["token"];
+      userRole = res['role'];
 
       // Save token ke SharedPreferences
       final sp = await SharedPreferences.getInstance();
       await sp.setString("jwt_token", token!);
+      await sp.setString("role", userRole!);
 
       loading = false;
       notifyListeners();
@@ -47,13 +50,19 @@ class AuthProvider extends ChangeNotifier {
     String username,
     String password,
     String namaLengkap,
+    String role,
   ) async {
     loading = true;
     errorMessage = null;
     notifyListeners();
 
     try {
-      final res = await authService.register(username, password, namaLengkap);
+      final res = await authService.register(
+        username,
+        password,
+        namaLengkap,
+        role,
+      );
 
       loading = false;
       notifyListeners();

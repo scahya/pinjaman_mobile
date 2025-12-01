@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'api_client.dart';
 
 class PinjamanService {
@@ -18,16 +19,32 @@ class PinjamanService {
     throw Exception('Gagal ambil semua pengajuan');
   }
 
-  Future<Map?> ajukan(Map payload) async {
-    final res = await client.post('/api/pinjaman/ajukan', payload);
-    return jsonDecode(res.body);
-  }
-
-  Future<Map?> approveReject(String id, String status, {String? note}) async {
-    final res = await client.put('/api/pinjaman/$id/approve', {
-      'status': status,
-      'note': note ?? '',
+  Future<Map?> ajukan(
+    String nik,
+    String alamat,
+    String noTelepon,
+    int jumlahPinjaman,
+  ) async {
+    final res = await client.post('/api/pinjaman/ajukan', {
+      "nik": nik,
+      "alamat": alamat,
+      "noTelepon": noTelepon,
+      "jumlahPinjaman": jumlahPinjaman,
     });
     return jsonDecode(res.body);
   }
+
+  Future<Map?> approveReject(
+    String id,
+    String catatanAdmin,
+    String status,
+  ) async {
+    final res = await client.put('/api/pinjaman/$id/approve', {
+      'status': status,
+      'catatanAdmin': catatanAdmin ?? '',
+    });
+    return jsonDecode(res.body);
+  }
+
+  getPinjamanNasabah() async {}
 }

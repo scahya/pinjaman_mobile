@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:pinjaman_mobile/api/pinjaman_service.dart';
+import 'package:pinjaman_mobile/providers/pinjaman_provider.dart';
 import 'package:pinjaman_mobile/screens/auth/register_screen.dart';
 import 'package:pinjaman_mobile/screens/auth/splash_screen.dart';
 import 'package:pinjaman_mobile/screens/home/home_screen.dart';
@@ -12,11 +14,15 @@ import 'screens/auth/login_screen.dart';
 void main() {
   final apiClient = ApiClient(baseUrl: "http://10.0.2.2:9194");
   final authService = AuthService(apiClient);
+  final pinjamanService = PinjamanService(apiClient);
 
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider(authService)),
+        ChangeNotifierProvider(
+          create: (_) => PinjamanProvider(pinjamanService),
+        ),
       ],
       child: const MyApp(),
     ),
@@ -36,8 +42,6 @@ class MyApp extends StatelessWidget {
         "/splash": (_) => const SplashScreen(),
         "/login": (_) => const LoginScreen(),
         "/register": (_) => const RegisterScreen(),
-
-        // Ganti dengan halaman utama project Anda
         "/home": (_) => const HomeScreen(),
       },
     );
