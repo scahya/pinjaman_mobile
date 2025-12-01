@@ -1,23 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:pinjaman_mobile/models/pinjaman.dart';
 import 'package:pinjaman_mobile/providers/pinjaman_provider.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 
 class PinjamanListItem extends StatelessWidget {
-  final Map<String, dynamic> data;
+  final PinjamanModel data;
 
   const PinjamanListItem({super.key, required this.data});
 
   @override
   Widget build(BuildContext context) {
-    final auth = Provider.of<AuthProvider>(context, listen: false);
-    final role = auth.userRole;
+    final role = Provider.of<AuthProvider>(context, listen: false).userRole;
 
-    if (role == "Admin") {
-      return _AdminPinjamanItem(data: data);
-    } else {
-      return _NasabahPinjamanItem(data: data);
-    }
+    return role == "Admin"
+        ? _AdminPinjamanItem(data: data)
+        : _NasabahPinjamanItem(data: data);
   }
 }
 
@@ -25,7 +23,7 @@ class PinjamanListItem extends StatelessWidget {
 /// NASABAH CARD
 /// =======================
 class _NasabahPinjamanItem extends StatelessWidget {
-  final Map<String, dynamic> data;
+  final PinjamanModel data;
 
   const _NasabahPinjamanItem({required this.data});
 
@@ -34,22 +32,20 @@ class _NasabahPinjamanItem extends StatelessWidget {
     print("catatan Admin : ${data}");
     return Card(
       margin: const EdgeInsets.all(8),
-      color: data['status'] == "Approved"
+      color: data.status == "Approved"
           ? Color(0xFF91f58c)
-          : data['status'] == "Rejected"
+          : data.status == "Rejected"
           ? Color(0xFFfaa69d)
           : Color(0xFFd9f2fa),
       child: ListTile(
-        title: Text("Jumlah: Rp ${data['jumlahPinjaman']}"),
+        title: Text("Jumlah: Rp ${data.jumlahPinjaman}"),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "Status: ${data['status']} • Catatan: ${data['catatanAdmin'] ?? '-'}",
+              "Status: ${data.status} • Catatan: ${data.catatanAdmin ?? '-'}",
             ),
-            Text(
-              "Approved By: ${data['approvedByUser']?['namaLengkap'] ?? '-'}",
-            ),
+            Text("Approved By: ${data.approvedByUser?.namaLengkap ?? '-'}"),
           ],
         ),
       ),
@@ -61,7 +57,7 @@ class _NasabahPinjamanItem extends StatelessWidget {
 /// ADMIN CARD
 /// =======================
 class _AdminPinjamanItem extends StatelessWidget {
-  final Map<String, dynamic> data;
+  final PinjamanModel data;
 
   const _AdminPinjamanItem({required this.data});
 
@@ -104,11 +100,11 @@ class _AdminPinjamanItem extends StatelessWidget {
             ),
             onPressed: () async {
               final catatanAdmin = catatanController.text.trim();
-              print("Data id ${data['id']}");
+              print("Data id ${data.id}");
               print("Data noote ${catatanAdmin}");
               print("Data action ${action}");
               final success = await pinjamanProvider.putApproveRejectPinjaman(
-                data['id'],
+                data.id,
                 catatanAdmin,
                 action == "approve" ? "Approved" : "Rejected",
               );
@@ -148,21 +144,21 @@ class _AdminPinjamanItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: data['status'] == "Approved"
+      color: data.status == "Approved"
           ? Color(0xFF91f58c)
-          : data['status'] == "Rejected"
+          : data.status == "Rejected"
           ? Color(0xFFfaa69d)
           : Color(0xFFd9f2fa),
       margin: const EdgeInsets.all(8),
       child: ListTile(
-        title: Text("Nasabah: ${data['namaLengkap']}"),
+        title: Text("Nasabah: ${data.namaLengkap}"),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Nik: ${data['nik']}"),
-            Text("Jumlah: Rp ${data['jumlahPinjaman']}"),
-            Text("Status: ${data['status']}"),
-            Text("${data['createdAt']}"),
+            Text("Nik: ${data.nik}"),
+            Text("Jumlah: Rp ${data.jumlahPinjaman}"),
+            Text("Status: ${data.status}"),
+            Text("${data.createdAt}"),
           ],
         ),
 

@@ -2,13 +2,14 @@ import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:pinjaman_mobile/api/pinjaman_service.dart';
+import 'package:pinjaman_mobile/models/pinjaman.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class PinjamanProvider extends ChangeNotifier {
   final PinjamanService pinjamanService;
-  List<dynamic> pinjamanList = [];
+  List<PinjamanModel> pinjamanList = [];
   bool loading = false;
   String? errorMessage;
 
@@ -16,23 +17,18 @@ class PinjamanProvider extends ChangeNotifier {
 
   Future<void> fetchPinjamanList() async {
     loading = true;
-    errorMessage = null;
-    final prefs = await SharedPreferences.getInstance();
-    final role = prefs.getString("role");
-    print('The value of x is: $role');
-
     // notifyListeners();
-    try {
-      if (role == "Admin") {
-        pinjamanList = await pinjamanService.getAllPengajuan();
-      } else {
-        pinjamanList = await pinjamanService.getMyPengajuan();
-      }
 
-      // pinjamanList = await pinjamanService.getMyPengajuan();
-      loading = false;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final role = prefs.getString("role");
+      print('Role: $role');
+
+      pinjamanList = (role == "Admin")
+          ? await pinjamanService.getAllPengajuan()
+          : await pinjamanService.getMyPengajuan();
+
       errorMessage = null;
-      notifyListeners();
     } catch (e) {
       errorMessage = e.toString();
     }
@@ -83,6 +79,7 @@ class PinjamanProvider extends ChangeNotifier {
       final res = await pinjamanService.approveReject(id, catatanAdmin, status);
       loading = false;
       notifyListeners();
+      await fetchPinjamanList();
 
       return true;
     } catch (e) {

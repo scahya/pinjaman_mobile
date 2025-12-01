@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:pinjaman_mobile/models/pinjaman.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'api_client.dart';
 
@@ -7,15 +8,23 @@ class PinjamanService {
   final ApiClient client;
   PinjamanService(this.client);
 
-  Future<List> getMyPengajuan() async {
+  Future<List<PinjamanModel>> getMyPengajuan() async {
     final res = await client.get('/api/pinjaman/nasabah');
-    if (res.statusCode == 200) return jsonDecode(res.body);
+    if (res.statusCode == 200) {
+      final List<dynamic> body = jsonDecode(res.body);
+
+      return body.map((e) => PinjamanModel.fromJson(e)).toList();
+    }
     throw Exception('Gagal ambil pengajuan');
   }
 
-  Future<List> getAllPengajuan() async {
+  Future<List<PinjamanModel>> getAllPengajuan() async {
     final res = await client.get('/api/pinjaman/list');
-    if (res.statusCode == 200) return jsonDecode(res.body);
+    if (res.statusCode == 200) {
+      final List<dynamic> body = jsonDecode(res.body);
+
+      return body.map((e) => PinjamanModel.fromJson(e)).toList();
+    }
     throw Exception('Gagal ambil semua pengajuan');
   }
 
